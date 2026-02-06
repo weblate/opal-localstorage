@@ -141,7 +141,7 @@ Item {
     /*!
       This function hides an overlay for an event.
 
-      Call this to hide the overlay for event an event with
+      Call this to hide the overlay for an event with
       the handle \a handle that was previously shown using
       \l showOverlay.
 
@@ -154,9 +154,26 @@ Item {
         }
     }
 
-    // TODO
+    /*!
+      Mark an overlay as dismissible.
+
+      By default, overlays cannot be dismissed by the user. They are
+      only hidden if the implementation explicitly calls \l hideOverlay
+      for a specific overlay.
+
+      Call \l allowDismissOverlay to allow the user to dismiss an
+      overlay manually. This is useful for showing messages for errors
+      that still allow the app to function properly.
+    */
     function allowDismissOverlay(handle) {
-        // TODO
+        if (__events.hasOwnProperty(handle)) {
+            __events[handle].allowDismiss = true
+            __events[handle].dismissed.connect(function(){
+                if (__events.hasOwnProperty(handle)) {
+                    delete __events[handle]
+                }
+            })
+        }
     }
 
     // Register the internal event signal with the storage script.

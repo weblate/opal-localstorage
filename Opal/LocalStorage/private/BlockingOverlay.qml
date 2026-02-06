@@ -15,7 +15,10 @@ Rectangle {
     property alias hintText: label.hintText
     property alias smallprint: label.smallprintText
     property alias busy: label.running
+    property bool allowDismiss: false
     property bool _destroyAfterHiding: false
+
+    signal dismissed
 
     readonly property bool _portrait: (__silica_applicationwindow_instance.orientation
                                       & Orientation.PortraitMask) !== 0
@@ -43,14 +46,31 @@ Rectangle {
         id: flick
         anchors.fill: parent
         anchors.centerIn: parent
-        contentHeight: label.height
+        contentHeight: column.height + Theme.horizontalPageMargin
         contentWidth: root.width
 
         VerticalScrollDecorator { flickable: flick }
 
-        ExtendedBusyLabel {
-            id: label
-            running: root.visible
+        Column {
+            id: column
+            width: parent.width
+            spacing: Theme.paddingLarge
+
+            ExtendedBusyLabel {
+                id: label
+                running: root.visible
+            }
+
+            Button {
+                preferredWidth: Theme.buttonWidthLarge
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTranslate("Opal.LocalStorage", "Dismiss", "as in “hide (dismiss) this popup message”")
+                visible: allowDismiss
+                onClicked: {
+                    hide(true)
+                    dismissed()
+                }
+            }
         }
     }
 
