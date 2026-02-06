@@ -831,6 +831,8 @@ function Database(handle, name, description) {
 
       \warning this function is experimental!
 
+      \warning never call this function outside of a migration!
+
       This function sets up a table to automatically update an ordering column.
       It does so by creating a view on the table with triggers that handle updating
       the ordering column.
@@ -877,7 +879,12 @@ function Database(handle, name, description) {
             The column must be of type \c INTEGER.
       \endtable
 
-      \warning never call this function outside of a migration!
+      \section2 Updating the table:
+
+      You may update the underlying table (\c _myTable) in a migration.
+      You must \b first drop the sortable view: \c {tx.executeSql('DROP VIEW IF EXISTS myTable;')}
+      Then apply your changes to the \c _myTable. Last, you must call
+      \l makeTableSortable again to recreate the view.
 
       \section2 Warnings:
 
