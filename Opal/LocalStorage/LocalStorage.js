@@ -495,12 +495,7 @@ function Database(handle, name, description) {
       Returns the internal database object.
     */
     this.getDatabase = (function() {
-        if (!this.isOk) {
-            this._error("database is not available, check previous logs")
-            throw new Error("database is not available, check previous logs")
-        }
-
-        if (!this.__initialized || this.__db === null) {
+        if (this.isOk && (!this.__initialized || this.__db === null)) {
             this._log("initializing database...")
             this.__db = LS.LocalStorage.openDatabaseSync(
                 this.name, "", this.description, this._expectedSize)
@@ -515,6 +510,11 @@ function Database(handle, name, description) {
             } else {
                 this.isOk = false
             }
+        }
+
+        if (!this.isOk) {
+            this._error("database is not available, check previous logs")
+            throw new Error("database is not available, check previous logs")
         }
 
         return this.__db
