@@ -1,7 +1,7 @@
 //@ This file is part of opal-localstorage.
 //@ https://github.com/Pretty-SFOS/opal-localstorage
 //@ SPDX-License-Identifier: GPL-3.0-or-later
-//@ SPDX-FileCopyrightText: 2018-2025 Mirian Margiani
+//@ SPDX-FileCopyrightText: 2018-2026 Mirian Margiani
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
@@ -195,8 +195,12 @@ Item {
             return
         }
 
-        function _show(title, hint) {
-            showOverlay(handle, title, hint, busy)
+        function _show(title, hint, smallprint, dismissible) {
+            showOverlay(handle, title, hint, busy, smallprint)
+
+            if (!!dismissible) {
+                allowDismissOverlay(handle)
+            }
         }
 
         switch (event) {
@@ -215,19 +219,14 @@ Item {
             break
         case "upgrade-failed":
             _show(qsTranslate("Opal.LocalStorage", "Database upgrade failed"),
-                  "<p>"+qsTranslate("Opal.LocalStorage",
+                  qsTranslate("Opal.LocalStorage",
                               "An error occurred while upgrading " +
                               "the database from version %1 to version %2. " +
-                              "Please report this issue.").
-                  arg(data.from).arg(data.to) +
-                  "</p><p><font size='2'><br><b>" +
-                  qsTranslate("Opal.LocalStorage", "Developer information:") +
-                  "</b><br>
-                    %1<br>
-                    Stack:<br>%2
-                  </font></p>
-                  ".arg(data.exception).arg(data.exception.stack.split('\n').join('<br><br>'))
-                  )
+                              "Please report this issue.").arg(data.from).arg(data.to),
+                  "%1<br><br>Stack:<br>%2".arg(data.exception).arg(
+                      data.exception.stack.split('\n').join('<br><br>')),
+                  false
+            )
             break
         case "invalid-version":
             _show(qsTranslate("Opal.LocalStorage", "Invalid database version"),
@@ -243,14 +242,12 @@ Item {
             break
         default:
             _show(qsTranslate("Opal.LocalStorage", "Database issue"),
-                  "<p>"+qsTranslate("Opal.LocalStorage", "An unexpected issue occurred in the database. Try restarting the app.") +
-                  "</p><p><font size='2'>
-                   <br><b>" +
-                  qsTranslate("Opal.LocalStorage", "Developer information:")
-                  + "</b><br>
-                   Event: %1<br>
-                   Data: %2
-                   </font></p>".arg(event).arg(JSON.stringify(data)))
+                  qsTranslate("Opal.LocalStorage",
+                              "An unexpected issue occurred in the database. " +
+                              "Try restarting the app."),
+                  "Event: %1<br><br>Data:<br><pre>%2</pre>".arg(event).arg(JSON.stringify(data, 2, 2)),
+                  false
+            )
             break
         }
     }
