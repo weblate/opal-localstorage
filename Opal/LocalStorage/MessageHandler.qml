@@ -69,16 +69,6 @@ import "."
 Item {
     id: root
 
-    // Handle this to handle custom user events.
-    /*
-        onUserSignalReceived: {
-            switch (event) {
-            default:
-                console.log("EVENT", event, handle, busy, JSON.stringify(data))
-            }
-        }
-    */
-
     /*!
       This signal is triggered when the storage backend sends an event.
 
@@ -123,12 +113,16 @@ Item {
       content in overlay. If \a busy is \c true, the overlay will
       include a busy spinner.
 
+      Optionally add detailed pre-formatted information in the
+      \a smallprint string. This may be used to show details for
+      bug reporting.
+
       \sa hideOverlay
     */
-    function showOverlay(handle, title, description, busy) {
+    function showOverlay(handle, title, description, busy, smallprint) {
         var obj = overlayComponent.createObject(
             __silica_applicationwindow_instance,
-            {text: title, hintText: description, busy: busy})
+            {text: title, hintText: description, smallprint: smallprint || "", busy: busy})
 
         if (obj === null) {
             console.error(_lc, "failed to show status overlay!")

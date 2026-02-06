@@ -13,6 +13,7 @@ Rectangle {
 
     property alias text: label.text
     property alias hintText: label.hintText
+    property alias smallprint: label.smallprintText
     property alias busy: label.running
     property bool _destroyAfterHiding: false
 

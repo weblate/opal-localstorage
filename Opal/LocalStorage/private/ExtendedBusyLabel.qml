@@ -12,6 +12,7 @@ Column {
     property alias running: indicator.running
     property alias text: label.text
     property alias hintText: hintLabel.text
+    property alias smallprintText: smallprintLabel.text
 
     readonly property bool _portrait: (__silica_applicationwindow_instance.orientation
                                       & Orientation.PortraitMask) !== 0
@@ -47,5 +48,38 @@ Column {
         opacity: Theme.opacityHigh
         font.pixelSize: Theme.fontSizeLarge
         textFormat: Text.AutoText
+    }
+
+    Item {
+        width: parent.width
+        height: !!smallprintText ? Theme.paddingLarge : 0
+    }
+
+    Button {
+        preferredWidth: Theme.buttonWidthLarge
+        anchors.horizontalCenter: parent.horizontalCenter
+        text: qsTranslate("Opal.LocalStorage", "Show details")
+        visible: !!smallprintText
+
+        onClicked: {
+            visible = false
+            smallprintLabel.visible = true
+        }
+    }
+
+    InfoLabel {
+        id: smallprintLabel
+        wrapMode: Text.Wrap
+        horizontalAlignment: Text.AlignLeft
+        font {
+            pixelSize: Theme.fontSizeExtraSmall
+            family: "monospace"
+            bold: false
+        }
+
+        // reduce brightness because Saiflish's monospace
+        // font is bold by default
+        opacity: Theme.opacityHigh
+        visible: false
     }
 }
