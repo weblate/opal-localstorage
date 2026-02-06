@@ -425,6 +425,8 @@ function Database(handle, name, description) {
                             "\n   ERROR  >", e,
                             "\n   STACK  >\n", e.stack)
             }
+        } else {
+            this._warn("no event handler installed")
         }
 
         return __handle

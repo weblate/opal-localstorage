@@ -188,6 +188,7 @@ Item {
         if (!force && !!LocalStorage._DB_STATUS_SIGNAL) {
             console.warn(_lc, "database status signal already set!")
         } else {
+            console.log(_lc, "database event handler installed")
             LocalStorage._DB_STATUS_SIGNAL = __databaseSignalReceived
         }
     }
