@@ -70,6 +70,13 @@ Item {
     id: root
 
     /*!
+      This property enables dismissible overlays for all storage signals.
+
+      \defaultValue false
+    */
+    property bool debugMode: false
+
+    /*!
       This signal is triggered when the storage backend sends an event.
 
       See \l MessageHandler for an example how to handle this signal.
@@ -189,18 +196,27 @@ Item {
     parent: __silica_applicationwindow_instance
 
     on__DatabaseSignalReceived: {
-        if (/^user-/.test(handle)) {
-            __userEvents[handle] = 1
-            userSignalReceived(event, handle, busy, data)
-            return
-        }
-
         function _show(title, hint, smallprint, dismissible) {
             showOverlay(handle, title, hint, busy, smallprint)
 
             if (!!dismissible) {
                 allowDismissOverlay(handle)
             }
+        }
+
+        if (/^user-/.test(handle)) {
+            __userEvents[handle] = 1
+            userSignalReceived(event, handle, busy, data)
+
+            if (debugMode) {
+                _show(event,
+                      "user signal",
+                      "Event: %1<br><br>Data:<br><pre>%2</pre>".arg(event).arg(JSON.stringify(data, 2, 2)),
+                      true
+                )
+            }
+
+            return
         }
 
         switch (event) {
@@ -214,7 +230,7 @@ Item {
             // these events should be quick and don't need an overlay
             break
         case "query-failed":
-            if (!!data.notify) {
+            if (!!data.notify || debugMode) {
                 _show(qsTranslate("Opal.LocalStorage", "Database query failed"),
                       qsTranslate("Opal.LocalStorage", "An error occurred while accessing " +
                                   "the database.") + (!!data.fatal ? " " +
@@ -226,7 +242,7 @@ Item {
                           JSON.stringify(data.values)).arg(
                           !!data.readOnly ? "true" : "false").arg(
                           data.exception.stack.split('\n').join('<br><br>')),
-                      !data.fatal
+                      !data.fatal || debugMode
                 )
             }
             break
@@ -238,7 +254,7 @@ Item {
                               "Please report this issue.").arg(data.from).arg(data.to),
                   "%1<br><br>Stack:<br>%2".arg(data.exception).arg(
                       data.exception.stack.split('\n').join('<br><br>')),
-                  false
+                  false || debugMode
             )
             break
         case "invalid-version":
@@ -247,11 +263,15 @@ Item {
                               "The app cannot start because " +
                               "the database has version %1 " +
                               "but only version %2 is supported.").
-                  arg(data.got).arg(data.expected))
+                  arg(data.got).arg(data.expected),
+                  "",
+                  false || debugMode)
             break
         case "maintenance":
             _show(qsTranslate("Opal.LocalStorage", "Database Maintenance"),
-                  qsTranslate("Opal.LocalStorage", "Please be patient and allow up to 30 seconds for this."))
+                  qsTranslate("Opal.LocalStorage", "Please be patient and allow up to 30 seconds for this."),
+                  "",
+                  false || debugMode)
             break
         default:
             _show(qsTranslate("Opal.LocalStorage", "Database issue"),
@@ -259,7 +279,7 @@ Item {
                               "An unexpected issue occurred in the database. " +
                               "Try restarting the app."),
                   "Event: %1<br><br>Data:<br><pre>%2</pre>".arg(event).arg(JSON.stringify(data, 2, 2)),
-                  false
+                  false || debugMode
             )
             break
         }
