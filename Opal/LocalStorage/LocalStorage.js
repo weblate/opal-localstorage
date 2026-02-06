@@ -574,7 +574,7 @@ function Database(handle, name, description) {
     }).bind(this)
 
     /*!
-      \qmlmethod object Database::simpleQuery(string query, list values, bool readOnly)
+      \qmlmethod object Database::simpleQuery(string query, list values, bool readOnly, object errorAction)
 
       This function performs a safe query on the database. Any changes will be
       rolled back if the query fails.
@@ -658,12 +658,27 @@ function Database(handle, name, description) {
       \value insertId \c null
       \value rows \c []
 
-      Also, an internal event is dispatched. Setup \l MessageHandler to handle
-      this event.
+      You may \i optionally pass additional instructions in the
+      \a errorAction argument. You may pass an object with the following
+      properties:
+
+      \value notify bool (default: \c false)
+      \value fatal bool (ignored if \c notify is \c false, default: \c true)
+
+      If \c notify is \c true, the user will be notified of the error. The
+      user may dismiss the notification if \c fatal is \c false. Otherwise,
+      the app will be blocked from further interaction and the user
+      will be instructed to restart the app.
+
+      By default, the user will not be notified, and you are expected to
+      implement graceful recovery from failed queries.
+
+      In any case, an internal \c query-failed event is dispatched. Setup
+      \l MessageHandler to handle this event.
 
       \sa QtQuick.LocalStorage, guardedTx
     */
-    this.simpleQuery = (function(query, values, readOnly) {
+    this.simpleQuery = (function(query, values, readOnly, errorAction) {
         var db = this.getDatabase()
         var res = {
             ok: false,
@@ -672,7 +687,14 @@ function Database(handle, name, description) {
             rows: []
         }
 
+        // allow sending errorAction as third argument
+        if (typeof readOnly === 'object' && typeof errorAction === 'undefined') {
+            errorAction = readOnly
+            readOnly = false
+        }
+
         values = defaultFor(values, [])
+        errorAction = defaultFor(errorAction, {})
 
         if (!query) {
             this._error("bug: cannot execute an empty database query")
@@ -720,7 +742,9 @@ function Database(handle, name, description) {
                 exception: e,
                 query: query,
                 values: values,
-                readOnly: readOnly
+                readOnly: readOnly,
+                notify: defaultFor(errorAction.notify, false),
+                fatal: defaultFor(errorAction.fatal, true),
             })
             res.ok = false
         }

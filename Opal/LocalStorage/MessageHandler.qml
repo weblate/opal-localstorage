@@ -214,8 +214,21 @@ Item {
             // these events should be quick and don't need an overlay
             break
         case "query-failed":
-            // TODO this event should probably show a message that can
-            // be dismissed. Maybe it needs more manual control?
+            if (!!data.notify) {
+                _show(qsTranslate("Opal.LocalStorage", "Database query failed"),
+                      qsTranslate("Opal.LocalStorage", "An error occurred while accessing " +
+                                  "the database.") + (!!data.fatal ? " " +
+                          qsTranslate("Opal.LocalStorage", "Try restarting the app.") + " " +
+                          qsTranslate("Opal.LocalStorage", "Please report this issue if it happens again.") : ""),
+                      "Exception: %1<br><br>Query: <pre>%2</pre><br><br>Values: %3<br>Read-only: %4<br><br>Stack:<br>%5".arg(
+                          data.exception).arg(
+                          data.query).arg(
+                          JSON.stringify(data.values)).arg(
+                          !!data.readOnly ? "true" : "false").arg(
+                          data.exception.stack.split('\n').join('<br><br>')),
+                      !data.fatal
+                )
+            }
             break
         case "upgrade-failed":
             _show(qsTranslate("Opal.LocalStorage", "Database upgrade failed"),
