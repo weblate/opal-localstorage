@@ -1,7 +1,7 @@
 //@ This file is part of opal-localstorage.
 //@ https://github.com/Pretty-SFOS/opal-localstorage
 //@ SPDX-License-Identifier: GPL-3.0-or-later
-//@ SPDX-FileCopyrightText: 2025 Mirian Margiani
+//@ SPDX-FileCopyrightText: 2025-2026 Mirian Margiani
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
@@ -14,17 +14,9 @@ Column {
     property alias hintText: hintLabel.text
     property alias smallprintText: smallprintLabel.text
 
-    readonly property bool _portrait: (__silica_applicationwindow_instance.orientation
-                                      & Orientation.PortraitMask) !== 0
-
     spacing: Theme.paddingLarge
     width: parent.width
-    height: childrenRect.height
-
-    Item {
-        width: parent.width
-        height: Math.round(_portrait ? Screen.height/4 : Screen.width/4)
-    }
+    // height: childrenRect.height -- includes height of hidden elements
 
     BusyIndicator {
         id: indicator

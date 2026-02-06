@@ -1,7 +1,7 @@
 //@ This file is part of opal-localstorage.
 //@ https://github.com/Pretty-SFOS/opal-localstorage
 //@ SPDX-License-Identifier: GPL-3.0-or-later
-//@ SPDX-FileCopyrightText: 2018-2025 Mirian Margiani
+//@ SPDX-FileCopyrightText: 2018-2026 Mirian Margiani
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
@@ -32,6 +32,13 @@ Rectangle {
         _destroyAfterHiding = destroyAfter
     }
 
+    function dismiss() {
+        // may be called even if allowDismiss is false to
+        // support dismissing after custom actions
+        hide(true)
+        dismissed()
+    }
+
     state: "hidden"
     visible: false
     opacity: 0.0
@@ -49,26 +56,54 @@ Rectangle {
         contentHeight: column.height + Theme.horizontalPageMargin
         contentWidth: root.width
 
+        Loader {
+            active: allowDismiss
+            sourceComponent: Component {
+                PullDownMenu {
+                    MenuItem {
+                        text: qsTranslate("Opal.LocalStorage", "Dismiss", "as in “hide (dismiss) this popup message”")
+                        onClicked: dismiss()
+                    }
+                }
+            }
+        }
+
+        Loader {
+            active: allowDismiss
+            sourceComponent: Component {
+                PushUpMenu {
+                    MenuItem {
+                        text: qsTranslate("Opal.LocalStorage", "Dismiss", "as in “hide (dismiss) this popup message”")
+                        onClicked: dismiss()
+                    }
+                }
+            }
+        }
+
         VerticalScrollDecorator { flickable: flick }
 
         Column {
             id: column
-            width: parent.width
-            spacing: Theme.paddingLarge
 
-            ExtendedBusyLabel {
-                id: label
-                running: root.visible
+            height: childrenRect.height
+            width: parent.width
+
+            Item {
+                width: parent.width
+                height: body.height > root.height ?
+                    3 * Theme.horizontalPageMargin : (root.height-body.height)/2
             }
 
-            Button {
-                preferredWidth: Theme.buttonWidthLarge
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTranslate("Opal.LocalStorage", "Dismiss", "as in “hide (dismiss) this popup message”")
-                visible: allowDismiss
-                onClicked: {
-                    hide(true)
-                    dismissed()
+            Column {
+                id: body
+
+                width: parent.width
+                height: childrenRect.height
+                spacing: Theme.paddingLarge
+
+                ExtendedBusyLabel {
+                    id: label
+                    running: root.visible
                 }
             }
         }
