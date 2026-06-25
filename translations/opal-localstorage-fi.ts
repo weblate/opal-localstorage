@@ -17,7 +17,7 @@
         <location filename="../Opal/LocalStorage/MessageHandler.qml" line="213"/>
         <location filename="../Opal/LocalStorage/MessageHandler.qml" line="238"/>
         <source>Developer information:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kehittäjän tiedot:</translation>
     </message>
     <message>
         <location filename="../Opal/LocalStorage/MessageHandler.qml" line="222"/>
@@ -27,12 +27,12 @@
     <message>
         <location filename="../Opal/LocalStorage/MessageHandler.qml" line="223"/>
         <source>The app cannot start because the database has version %1 but only version %2 is supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sovelluksen käynnistäminen epäonnistui, koska tietokannan versio on %1, mutta vain versio %2 on tuettu.</translation>
     </message>
     <message>
         <location filename="../Opal/LocalStorage/MessageHandler.qml" line="230"/>
         <source>Database Maintenance</source>
-        <translation type="unfinished"></translation>
+        <translation>Tietokannan ylläpito</translation>
     </message>
     <message>
         <location filename="../Opal/LocalStorage/MessageHandler.qml" line="231"/>
